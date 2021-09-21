@@ -1,1 +1,1 @@
-# iot-thermometer
+# belepteto-rendszer
