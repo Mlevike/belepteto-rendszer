@@ -1,10 +1,15 @@
 #!/bin/python3
-
+# NEEM TAB HANEM 4 DB SZÓKÖZ!!!
+#SSH-N KERESZTÜL NEM MŰKÖDIK !!!
 #Beimportaljuk a szukseges konyvtarakat
 from __future__ import print_function
 import RPi.GPIO as GPIO
 import time
 import mysql.connector
+import RPi_I2C_driver
+
+#Inicialiáljuk LCD-t
+mylcd = RPi_I2C_driver.lcd()
 
 #Inicializáljuk a GPIO-t
 GPIO.setmode(GPIO.BCM)
@@ -65,36 +70,66 @@ def SzamBeker():
             GPIO.output(oszlopok[i], 0)
 
 def KodBeker():
+    mylcd.lcd_clear() # Ürítsük a kijelző tartalmát
+    mylcd.lcd_display_string("Kerem a kodot:", 1) #Kiirás a kijeltőre
     kod = ""
+    csillagok = ""
     while len(kod) < 4:
         time.sleep(0.4)
         szam = SzamBeker()
         if szam != "OK":
             if szam == "CANCEL":
-                return ""
+                return "szam"
             else:
+                csillagok = csillagok + '*'
+                mylcd.lcd_display_string(csillagok, 2)
                 kod = kod + szam
+                print(szam)
     return kod
 
 #Foprogram
+proba = 0
 while True:
 #Erre lehet hogy majd kell háttérben futó megoldást találni
 #Adatok beolvasása
+    mylcd.lcd_clear()
+    mylcd.lcd_display_string("Kerem a kartyat!", 1)
     id = input()
+    print("Kártyabeolvasás megtörtént")
     cnx = mysql.connector.connect(user='phpmyadmin', password='raspberry',
                               host='localhost',
                               database='belepteto')
     mycursor = cnx.cursor()
 
-    sql = "SELECT * FROM `hitelesítés` WHERE `CardID` =  '" + id + "'"
+    sql = "SELECT Password FROM `hitelesítés` WHERE `CardID` =  '" + id + "'"
     mycursor.execute(sql)
     myresult = mycursor.fetchall()
 
+    print("Kodbeker meghívva!")
+    jelszo = KodBeker()
+    print ("KodBeker meghívva!")
+    print (jelszo)
+    print ( myresult[0][0])
+
+    if jelszo in myresult[0][0]:
+        print('Helyes jelszó :)')
+        mylcd.lcd_clear()
+        mylcd.lcd_display_string("Helyes jelszo :)", 1)
+        proba = 0
+        Nyitas()
+    else:
+        print('Helytelen jelszó :(')
+        mylcd.lcd_clear()
+        mylcd.lcd_display_string("Rossz jelszo :(", 1)
+        time.sleep(1)
+        proba = proba+1
+
     for x in myresult:
-      print(x)
+        print(x)
 
     #Nyitjuk az ajtót
-    Nyitas()
+    #Nyitas()
 
     cnx.close()
 
+#jelszó ellenőrzés 
