@@ -1,8 +1,10 @@
 #!/bin/python3
 
 #Beimportaljuk a szukseges konyvtarakat
+from __future__ import print_function
 import RPi.GPIO as GPIO
 import time
+import mysql.connector
 
 #Inicializáljuk a GPIO-t
 GPIO.setmode(GPIO.BCM)
@@ -61,4 +63,38 @@ def SzamBeker():
                         return szam;
                     #GPIO.output(oszlopok[i], 0)
             GPIO.output(oszlopok[i], 0)
-#Nyitas()
+
+def KodBeker():
+    kod = ""
+    while len(kod) < 4:
+        time.sleep(0.4)
+        szam = SzamBeker()
+        if szam != "OK":
+            if szam == "CANCEL":
+                return ""
+            else:
+                kod = kod + szam
+    return kod
+
+#Foprogram
+while True:
+#Erre lehet hogy majd kell háttérben futó megoldást találni
+#Adatok beolvasása
+    id = input()
+    cnx = mysql.connector.connect(user='phpmyadmin', password='raspberry',
+                              host='localhost',
+                              database='belepteto')
+    mycursor = cnx.cursor()
+
+    sql = "SELECT * FROM `hitelesítés` WHERE `CardID` =  '" + id + "'"
+    mycursor.execute(sql)
+    myresult = mycursor.fetchall()
+
+    for x in myresult:
+      print(x)
+
+    #Nyitjuk az ajtót
+    Nyitas()
+
+    cnx.close()
+
