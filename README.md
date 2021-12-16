@@ -14,7 +14,7 @@ Elfelejtett jelszó esetén igényelhető jelszóemlékeztető küldése előre 
 
 # Bekötési rajz
 
-![Mikroelektronika kapcsolási rajz](https://user-images.githubusercontent.com/55978703/140621063-c0fa1787-0edb-4f0d-9545-9185f401b9af.jpg)
+![Mikroelektronika kapcsolási rajz 2 0](https://user-images.githubusercontent.com/55978703/146350365-a7def187-c881-4c02-bb38-5284eb897b92.jpg)
 
 # Funkciók
 - Az RFID jogosultságokat egy adatbázis kezeli és tárolja az SD kártyán
